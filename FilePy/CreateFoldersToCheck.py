@@ -26,11 +26,10 @@ def CreateCatalogForChecks(Path_to_catalog):
     name_folder_to_checks = "Checks"
     os.chdir(Path_to_catalog)
     try:
-        path_to_folder_to_checks = os.getcwd() + "\\" + name_folder_to_checks
-        os.mkdir(x)
+        os.mkdir(name_folder_to_checks)
     except OSError:
         print("Folder with name: %s. Already has created on path: %s" % (name_folder_to_checks, os.getcwd()))
-    return path_to_folder_to_checks
+    return os.getcwd() + "\\" + name_folder_to_checks
 
 
 def CreateFoldersForChecks(array, path):
@@ -63,4 +62,3 @@ def getPathChecks():
     folders_path = r'C:\Users\zamot\OneDrive\Документы\GitHub\UPDautoCreate'
 
     return CreateFoldersForChecks(ConnectXLSX(x), CreateCatalogForChecks(folders_path))
-

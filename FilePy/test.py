@@ -1,3 +1,5 @@
+import re
+
 from CreateFoldersToCheck import getPathChecks, AutoParsePathXLSX
 import os
 import shutil as sh
@@ -18,11 +20,11 @@ def PathXmlInput():
 
 
 # open .xml and send attributes
-def SendAttribute(path):
+def SendAttribute(path_xml):
     line_id = str()
     line_num = str()
     try:
-        with open(path, 'r', encoding='Windows-1251') as files:
+        with open(path_xml, 'r', encoding='Windows-1251') as files:
             for line in files:
                 try:
                     if "Файл ИдФайл=" in line:
@@ -39,56 +41,96 @@ def SendAttribute(path):
 
 
 def modifyIDRCC(ID, RCC):
-    #global
+    # global
     num_out = 1412
-    return str(ID[14:-41]) + "_" + str(num_out), str(RCC[24:-38]) + "-" + str(num_out)
+    return str(ID[14:-41]) + "-" + str(num_out), str(RCC[24:-38]) + "-" + str(num_out)
 
 
 def modify_name_xml(path_xml):
-    #global
+    # global
     num_out = 1412
     return str(path_xml.split("//")[-1].split(".")[0]) + str(num_out)
 
-# def asdasd(path_xml, path_new_xml):
 
-# def asd(Id_modify, RCC_modify, Name_modify, ):
-    # копируем xml перемещаем в лок папку, там его меняем и идем дальше копировать в другую папку
+def RedirectFile(path_xml, path_to_main_folder_checks):
+    os.chdir(path_to_main_folder_checks)
+    for i in os.listdir(os.getcwd()):
+        os.chdir(i)
+        try:
+            sh.copy(path_xml, os.getcwd())
+            print("Copy ok")
+        except OSError:
+            print("Error in copy")
+        os.chdir(path_to_main_folder_checks)
 
 
+def ModifyXMLFile(path_to_main_folder_checks, Id_name, Id_name_modify):
+    os.chdir(path_to_main_folder_checks)
+    for i in os.listdir(os.getcwd()):
+        os.chdir(i)
+        for j in os.listdir(os.getcwd()):
+            path_local_check_xml_file = os.getcwd() + '//' + j
+            print(j)
+            try:
+                with open(path_local_check_xml_file, 'r', encoding='Windows-1251') as f:
+                    xml_data = f.read()
+                    xml_data = re.sub(Id_name[14:-41], Id_name_modify, xml_data)
+                f.close()
+                with open(j, 'w', encoding='Windows-1251') as f:
+                    f.write(xml_data)
+                f.close()
+            except IOError:
+                print("Error in modify_in_xml")
 
-    # try:
-    #     with open(path, 'r', encoding='Windows-1251') as files:
-    #         for line in files:
-    #             if "Файл ИдФайл=" in line:
-    #                 line.replace(line[14:-41], Id_modify)
-    #
-    #             if "НомерСчФ=" in line:
-    #                 line_num = file
-    #
-    #
-    #
-    # except IOError:
-    #     print("Failed to open file")
-    #
-       # files.close()
+        os.chdir(path_to_main_folder_checks)
 
-def RangeNameCheck():
-    array = 14
-    start_int = 1000  # int(input("введите начальный диапазон, с которой начнется проверка в int: "))
-    end_int = start_int + (array)  # len()
-    x = range(start_int, end_int)
-    return x
+
+def ModifyAttributeXMLFile(path_xml, modify_):
+    try:
+        with open(path, 'r', encoding='Windows-1251') as f:
+            xml_file = f.read()
+            xml_file = re.sub(Id_file[14:-41], x, xml_file)
+            print("Modify file successful")
+        f.close()
+    except IOError:
+        print("Error in ")
+    with open(path, 'w', encoding='Windows-1251') as f:
+        f.write(xml_file)
+    f.close()
 
 
 # C:\Users\zamot\OneDrive\Документы\GitHub\UPDautoCreate\XMLandXML\ON_NSCHFDOPPRPROS_2BM-2310031475-2012070307370849459200000000000_2BM-9718070427-771801001-20220921-.xml
 if __name__ == '__main__':
+    # получаем путь
     path = PathXmlInput()
-    #Id_file, Num_chf = SendAttribute(path)
 
-    #print(modifyIDRCC(Id_file, Num_chf))
+    # исходники
+    Id_file, Num_chf = SendAttribute(path)
 
-    #print(modify_name_xml(path))
+    # модифиц имя
+    name_xml = modify_name_xml(path)
 
-    #for i in os.listdir(getPathChecks()):
+    # for i in os.listdir(getPathChecks()):
+    # sh.copy(path, r'C://Users//zamot//OneDrive//Документы\GitHub\UPDautoCreate\Checks\CHCK_01_00')
 
-    sh.copyfile(path, 'C://Users//zamot//OneDrive//Документы//GitHub//UPDautoCreate\FilePy')
+    # модиф атрибуты
+    id_name, rcc_name = modifyIDRCC(Id_file, Num_chf)[0], modifyIDRCC(Id_file, Num_chf)[1]
+
+    # print(x,'\f ', y)
+
+    # with open(path, 'r', encoding='Windows-1251') as files:
+    #     xml_data = files.read()
+    #     xml_data = re.sub(Id_file[14:-41], x, xml_data)
+    #     print(xml_data)
+    # files.close()
+    #
+    # with open(path, 'w', encoding='Windows-1251') as files:
+    #     files.write(xml_data)
+    # files.close()
+
+    # asdasd =
+    getPathChecks = getPathChecks()
+    #print(path)
+    RedirectFile(path, getPathChecks)
+
+    ModifyXMLFile(getPathChecks, Id_file, id_name)
